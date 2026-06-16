@@ -8,7 +8,7 @@ dist/
 *.egg-info/
 .eggs/
 .env
-.venv
+.venv/
 env/
 venv/
 .pytest_cache/

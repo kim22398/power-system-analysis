@@ -13,6 +13,28 @@ readable, and extensible code.
 
 ---
 
+## Run it (main.py)
+
+A single `main.py` entry point at the repo root exposes the toolkit from the
+shell — no `PYTHONPATH` needed:
+
+```bash
+python main.py                      # run the flagship IEEE 9-bus demo
+python main.py --help               # list every subcommand
+python main.py powerflow            # Newton-Raphson power flow: bus/line/loss tables
+python main.py fault --bus 7 --type slg   # single-line-to-ground fault at bus 7
+python main.py test                 # run the pytest suite
+```
+
+| Subcommand | What it does |
+|---|---|
+| *(none)* / `demo` | Run the flagship IEEE 9-bus power-flow demonstration |
+| `powerflow [--tol --max-iter]` | Solve the 9-bus system and print bus, line, and loss tables |
+| `fault [--bus N --type 3ph\|slg --zf --x0-mult --r0-mult]` | Short-circuit study (Z-bus method) with per-bus voltage dip |
+| `test [pytest args]` | Run `python -m pytest tests/ -q` |
+
+---
+
 ## Table of Contents
 
 - [Features](#features)
