@@ -249,15 +249,16 @@ print(f"Bus voltages during fault: {result_3ph.v_bus_pu}")
 
 ```python
 from power_system import FaultAnalysis
-from power_system.ybus import ybus_to_zbus
 
 fa = FaultAnalysis(zf_pu=0.0)
 
-# Build sequence Z-bus matrices for your system
-Z1 = ybus_to_zbus(Y_positive_sequence)
-Z0 = ybus_to_zbus(Y_zero_sequence)
-
-result_slg = fa.single_line_to_ground(bus_idx=2, z1=Z1, z0=Z0)
+# Pass the positive- and zero-sequence Y-bus matrices directly;
+# they are inverted to Z-bus internally (y2 defaults to y1).
+result_slg = fa.single_line_to_ground(
+    bus_idx=2,
+    y1=Y_positive_sequence,
+    y0=Y_zero_sequence,
+)
 print(f"SLG fault current (phase A): {result_slg.i_fault_pu:.4f} pu")
 ```
 
