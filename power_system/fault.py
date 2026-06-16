@@ -53,6 +53,15 @@ class FaultAnalysis:
     """
 
     def __init__(self, zf_pu: float = 0.0) -> None:
+        """Initialise the fault analyser.
+
+        Parameters
+        ----------
+        zf_pu:
+            Fault impedance in per-unit.  Use ``0.0`` (default) for a
+            bolted (zero-impedance) fault, or a positive value to model
+            arc resistance or grounding impedance.
+        """
         self.zf_pu = zf_pu
 
     # ------------------------------------------------------------------

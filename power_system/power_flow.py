@@ -189,6 +189,7 @@ class NewtonRaphson:
 
     @staticmethod
     def _validate_slack(buses: list[Bus]) -> None:
+        """Raise ValueError if the bus list does not contain exactly one slack bus."""
         slack_buses = [b for b in buses if b.is_slack]
         if len(slack_buses) == 0:
             raise ValueError("Power flow requires exactly one slack bus; none found.")

@@ -37,6 +37,7 @@ BASE_KV = 230.0
 # ---------------------------------------------------------------------------
 
 def build_buses() -> list[Bus]:
+    """Return the nine Bus objects for the WSCC 9-bus test system."""
     buses = [
         Bus("Bus-1",  BusType.SLACK, v_pu=1.040, angle_rad=0.0,    p_pu=0.0,     q_pu=0.0,  base_kv=BASE_KV),
         Bus("Bus-2",  BusType.PV,   v_pu=1.025, angle_rad=0.0,    p_pu=1.63,    q_pu=0.0,  base_kv=BASE_KV),
@@ -56,6 +57,7 @@ def build_buses() -> list[Bus]:
 # ---------------------------------------------------------------------------
 
 def build_lines(buses: list[Bus]) -> list[Line]:
+    """Return the nine Line objects (3 transformers + 6 transmission lines) for the WSCC 9-bus system."""
     b = {bus.name: bus for bus in buses}
     lines = [
         # Transformers (low X, no shunt B)
@@ -78,6 +80,7 @@ def build_lines(buses: list[Bus]) -> list[Line]:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    """Run the IEEE 9-bus power flow and print bus voltages, line flows, and system losses."""
     print("=" * 65)
     print("  IEEE 9-Bus Test System — Newton-Raphson Power Flow")
     print(f"  System base: {BASE_MVA} MVA,  {BASE_KV} kV")
