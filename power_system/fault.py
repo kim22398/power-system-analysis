@@ -116,9 +116,9 @@ class FaultAnalysis:
     def single_line_to_ground(
         self,
         bus_idx: int,
-        z1: np.ndarray,
-        z0: np.ndarray,
-        z2: np.ndarray | None = None,
+        y1: np.ndarray,
+        y0: np.ndarray,
+        y2: np.ndarray | None = None,
         v_prefault: float | np.ndarray | None = None,
     ) -> FaultResult:
         """Compute a single-line-to-ground (SLG) fault at *bus_idx*.
@@ -136,14 +136,14 @@ class FaultAnalysis:
         ----------
         bus_idx:
             Zero-based index of the faulted bus.
-        z1:
-            Positive-sequence Z-bus matrix (n×n complex). If you pass the
-            **Y-bus**, it will be automatically inverted.
-        z0:
-            Zero-sequence Z-bus matrix (n×n complex).
-        z2:
-            Negative-sequence Z-bus matrix (n×n complex).  Defaults to the
-            positive-sequence Z-bus (valid for static machines / lines).
+        y1:
+            Positive-sequence **Y-bus** matrix (n×n complex). Inverted
+            internally to obtain the positive-sequence Z-bus.
+        y0:
+            Zero-sequence Y-bus matrix (n×n complex).
+        y2:
+            Negative-sequence Y-bus matrix (n×n complex).  Defaults to the
+            positive-sequence Y-bus (valid for static machines / lines).
         v_prefault:
             Pre-fault voltage vector (pu).  Defaults to 1∠0° everywhere.
 
@@ -153,20 +153,15 @@ class FaultAnalysis:
             Fault current (3I_a^{(1)}) and positive-sequence bus voltages
             during the fault.
         """
-        n = z1.shape[0]
+        n = y1.shape[0]
 
-        # Auto-detect if Y-bus passed (large diagonal magnitudes → invert)
-        if np.max(np.abs(np.diag(z1))) < 1.0:
-            pass  # already Z-bus
-        else:
-            z1 = ybus_to_zbus(z1)
-
-        if np.max(np.abs(np.diag(z0))) > 1.0:
-            z0 = ybus_to_zbus(z0)
-
-        z2_mat = z1 if z2 is None else z2
-        if np.max(np.abs(np.diag(z2_mat))) > 1.0:
-            z2_mat = ybus_to_zbus(z2_mat)
+        # Invert each sequence Y-bus to its Z-bus. Taking explicit Y-bus
+        # inputs (rather than guessing from diagonal magnitudes) keeps this
+        # consistent with three_phase_fault and avoids the near-singular
+        # ambiguity where a valid Z-bus can have large diagonal entries.
+        z1 = ybus_to_zbus(y1)
+        z0 = ybus_to_zbus(y0)
+        z2_mat = z1 if y2 is None else ybus_to_zbus(y2)
 
         v_pre = self._prefault_voltages(v_prefault, n)
         k = bus_idx

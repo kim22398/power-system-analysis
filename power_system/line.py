@@ -117,15 +117,20 @@ class Line:
         y_series = self.admittance()
         y_shunt = self.shunt_admittance()
 
-        # Account for off-nominal tap
-        a = self.tap_ratio * (1.0 + 0j)
+        # Off-nominal tap (with optional phase shift), matching build_ybus.
+        import cmath
+        a = self.tap_ratio * cmath.exp(1j * self.phase_shift_rad)
 
-        # Current injected into line from 'from' end
-        i_from = (v_f / a - v_t) * y_series + (v_f / a) * (y_shunt / 2.0)
+        # Branch terminal currents, consistent with the off-nominal-tap
+        # Y-bus model in build_ybus:
+        #   Y[f,f] = y_series/|a|^2 + y_shunt/2 ,  Y[f,t] = -y_series/conj(a)
+        #   Y[t,t] = y_series        + y_shunt/2 ,  Y[t,f] = -y_series/a
+        # so  I_from = Y[f,f]*V_f + Y[f,t]*V_t , etc.
+        i_from = (y_series / (abs(a) ** 2) + y_shunt / 2.0) * v_f \
+            - (y_series / a.conjugate()) * v_t
         s_from = v_f * i_from.conjugate()
 
-        # Current injected into line from 'to' end
-        i_to = (v_t - v_f / a) * y_series + v_t * (y_shunt / 2.0)
+        i_to = (y_series + y_shunt / 2.0) * v_t - (y_series / a) * v_f
         s_to = v_t * i_to.conjugate()
 
         return s_from, s_to
